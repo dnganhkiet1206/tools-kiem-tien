@@ -1,0 +1,33 @@
+# YAAS tool schema — mọi tool được đề xuất trong module phải có bản ghi theo schema này
+# (bảng trong prose được phép rút gọn cột; bản ghi đầy đủ nằm ở exports/tools.yaml)
+schema: yaas.tool
+schema_version: 2.0.0
+
+fields:
+  name:                {type: text}
+  evaluated_at:        {type: date, desc: "đánh giá tool mục nát nhanh nhất — bắt buộc có ngày"}
+  purpose:             {type: text}
+  strengths:           {type: list}
+  weaknesses:          {type: list, desc: ">= 1; tool 'không điểm yếu' = chưa đánh giá"}
+  alternatives:        {type: list}
+  open_source_equivalent: {type: text|null}
+  paid_equivalent:     {type: text|null}
+  license:             {type: text, desc: "tên license + ràng buộc thương mại; VERIFY nếu chưa đọc trực tiếp"}
+  mac_support:         {type: enum[yes, no, partial]}
+  windows_support:     {type: enum[yes, no, partial]}
+  linux_support:       {type: enum[yes, no, partial]}
+  offline_capability:  {type: enum[yes, no, partial]}
+  docker:              {type: enum[yes, no]}
+  api:                 {type: enum[yes, no, cli_only]}
+  mcp_compatibility:   {type: enum[native, via_wrapper, no, unknown]}
+  automation_score:    {type: int 0-5, desc: "thang GOVERNANCE PHASE 7"}
+  maintenance_status:  {type: enum[active, slow, stale], desc: "active = commit <= 3 tháng"}
+  community_health:    {type: enum[strong, ok, weak]}
+  performance:         {type: text, desc: "số đo trên máy operator nếu có; benchmark ngoài ghi nhãn A/B/C"}
+  memory_requirement:  {type: text}
+  gpu_requirement:     {type: text|null}
+  latency:             {type: text, desc: "theo đơn vị việc: tok/s, giây-TTS/phút-audio, phút-render/phút-video"}
+  scalability:         {type: text, desc: "chạy song song/queue được không"}
+  cost:                {type: text}
+  recommended_stage:   {type: enum[M1, M2, M3, optional]}
+  evidence:            {type: list, desc: "nguồn + nhãn A/B/C"}

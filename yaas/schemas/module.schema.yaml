@@ -1,0 +1,51 @@
+# YAAS module schema — bản chuẩn (canonical). Prose trong module .md phải khớp schema này.
+# required_from: M1 = bắt buộc từ bậc thủ công (video 1-5), M2 = bán tự động (6-15), M3 = factory (16+)
+schema: yaas.module
+schema_version: 2.0.0
+
+header:                       # đặt đầu file module, dạng yaml block
+  version:        {type: semver,  required_from: M1}
+  last_updated:   {type: date,    required_from: M1}
+  evidence_level: {type: enum[A, B, C, MIXED], required_from: M1}
+  confidence:     {type: enum[HIGH, MEDIUM, LOW], required_from: M1}
+  risk:           {type: text, desc: "rủi ro chính nếu module này sai", required_from: M2}
+  future_review:  {type: date, desc: "hạn rà lại; LOW confidence => <= +3 tháng", required_from: M1}
+
+context_capsule:              # <= 15 dòng, làm module tự đứng (GOVERNANCE C1)
+  required_from: M1
+  must_contain: [he_thong_la_gi, vi_tri_module, hien_phap_rut_gon, thuat_ngu_dung_trong_module, reader_baseline_ref]
+
+sections:                     # 16 mục nội dung
+  purpose:              {required_from: M1}
+  goal:                 {required_from: M1, desc: "đo được, có ngưỡng"}
+  inputs:               {required_from: M1, desc: "artifact + định dạng + nguồn"}
+  outputs:              {required_from: M1, desc: "artifact + định dạng + đích"}
+  dependencies:         {required_from: M2, desc: "tool, module khác (kèm tóm tắt 1 câu), API, quota"}
+  constraints:          {required_from: M1, desc: "chính sách, license, phần cứng, chi phí trần"}
+  execution:            {required_from: M1, desc: "các bước đánh số, chạy được bởi cold reader"}
+  validation:           {required_from: M1, desc: "kiểm output thế nào, bằng lệnh/checklist gì"}
+  acceptance_criteria:  {required_from: M2, desc: "ngưỡng pass/fail định lượng"}
+  failure_modes:        {required_from: M1, desc: "đánh số, kèm counter/phát hiện"}
+  recovery_strategy:    {required_from: M2}
+  alternatives:         {required_from: M2, desc: "decision tree, không câu 'dùng X' trần"}
+  automation_potential: {required_from: M2, desc: "automation score 0-5 + đường nâng"}
+  kpis:                 {required_from: M2, desc: "input/output/leading/lagging"}
+  cost:                 {required_from: M1, desc: "tiền + giờ người, cả khi = 0"}
+  roi:                  {required_from: M3}
+
+self_audit:                   # 8 câu, bắt buộc từ M1, phải có >= 1 điểm yếu thừa nhận
+  questions:
+    - diem_yeu
+    - lo_hong
+    - gia_dinh
+    - thong_tin_loi_thoi
+    - can_verify
+    - tu_dong_hoa_them_duoc_khong
+    - don_gian_hoa_duoc_khong
+    - co_workflow_tot_hon_khong
+
+exports:                      # >= 1 file máy-đọc trong yaas/exports/ (GOVERNANCE C5: exports thắng prose)
+  required_from: M1
+  formats_allowed: [yaml, json, mermaid, checklist.md]
+
+definition_of_done: xem GOVERNANCE.md PHASE 7 (6 điều kiện)

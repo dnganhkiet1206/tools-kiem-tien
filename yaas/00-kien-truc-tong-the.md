@@ -1,5 +1,18 @@
 # YAAS 00 — Kiến trúc tổng thể & State Machine
 
+```yaml
+version: 2.0.0
+last_updated: 2026-07-09
+evidence_level: MIXED      # kiến trúc = suy luận cấu trúc; số cụ thể có nhãn tại chỗ
+confidence: HIGH           # về cấu trúc; MEDIUM về các con số VERIFY
+risk: "state machine sai/thiếu => mọi module 03-08 hiện thực sai theo"
+future_review: 2026-10-09
+exports: [exports/state-machine.yaml]   # bản chuẩn máy-đọc — thắng prose khi lệch
+```
+
+## Context Capsule
+YAAS là specification cho một Content Factory YouTube do MỘT người vận hành trên laptop, chi phí khởi điểm ~0, ưu tiên AI mã nguồn mở; trả phí chỉ khi ROI chứng minh. Module này (00) định nghĩa kiến trúc + state machine mà mọi module khác hiện thực từng phần. Hiến pháp rút gọn: bằng chứng trên ý kiến (nhãn A/B/C/VERIFY) · hệ thống trên mẹo · open source trên vendor lock-in · tự động hoá sản xuất nhưng người duyệt giá trị (2 human gate cố định) · tái lập được trên sáng tạo. Thuật ngữ: *state* = một bước có trạng thái trong pipeline; *artifact* = file đầu ra của state; *human gate* = state chỉ người được phép chuyển tiếp; *M1/M2/M3* = ba bậc trưởng thành vận hành (thủ công có checklist / bán tự động / factory). Reader Baseline: biết dùng terminal + cài phần mềm (xem README).
+
 ## Goal
 Định nghĩa kiến trúc chuẩn của Content Factory: các tầng, luồng dữ liệu, state machine sản xuất một video từ ý tưởng đến analytics — để mọi chapter sau chỉ là hiện thực hoá từng khối, và mọi AI đọc spec đều dựng ra cùng một hệ.
 
@@ -61,6 +74,35 @@ THEN thêm queue đa kênh + Docker hoá + tách máy/GPU thuê theo `09`
 ```
 
 ## State Machine — 20 trạng thái
+
+**Bản chuẩn máy-đọc: `exports/state-machine.yaml`** — khi bảng dưới và file YAML lệch nhau, YAML thắng và bảng phải sửa theo (GOVERNANCE C5).
+
+```mermaid
+stateDiagram-v2
+    [*] --> Planning
+    Planning --> Research
+    Research --> Validation
+    Validation --> Script : đủ bằng chứng
+    Validation --> Research : thiếu (1 lần) / loại đề tài
+    Script --> FactCheck
+    FactCheck --> Review : sạch
+    FactCheck --> Script : có lỗi
+    Review --> Voice : HUMAN GATE 1 approve
+    Review --> Planning : reject
+    Voice --> Image
+    Image --> Video
+    Video --> Editing
+    Editing --> Thumbnail
+    Thumbnail --> SEO
+    SEO --> Publishing : HUMAN GATE 2
+    Publishing --> Analytics
+    Analytics --> Optimization
+    Optimization --> Planning : vòng mới
+    Optimization --> Scaling : trigger 09
+    Scaling --> Planning
+    Analytics --> Completed : hồ sơ 28d
+    note right of Review : mọi state fail → Retry(≤3, backoff 2ˣ) → Error → Recovery
+```
 
 Quy ước chung: mọi state ghi `(video_id, state, started_at, ended_at, cost, artifact_path, error)` vào DB; transition chỉ xảy ra khi Validation của state đạt; fail → `Retry` (tối đa N lần, backoff) → `Error` → `Recovery`.
 

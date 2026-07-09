@@ -1,0 +1,33 @@
+# YAAS state machine — BẢN CHUẨN máy-đọc (GOVERNANCE C5: file này thắng prose khi lệch nhau)
+# Nguồn prose: 00-kien-truc-tong-the.md
+version: 2.0.0
+last_updated: 2026-07-09
+
+globals:
+  record_per_state: [video_id, state, started_at, ended_at, cost, artifact_path, error]
+  retry: {max_attempts: 3, backoff: exponential_2x, rule: "lỗi giống hệt 2 lần -> đổi tham số trước lần 3"}
+  human_gates: [Review, Publishing]   # không được tự động hoá — điều kiện DoD
+  on_fail: Retry
+  on_retry_exhausted: Error
+
+states:
+  Planning:     {entry: backlog_nonempty,        in: [backlog, analytics_prev],  out: topic_pack,        next: Research,      validation: "đề tài đạt điểm ngưỡng module 01"}
+  Research:     {entry: topic_selected,          in: [topic_pack],               out: source_pack,       next: Validation,    validation: ">=5 nguồn, >=2 level A/B, mỗi claim chính >=1 nguồn có URL+ngày"}
+  Validation:   {entry: research_done,           in: [source_pack],              out: verdict,           next: {du: Script, thieu: Research_once_else_drop}, validation: "nguồn không mâu thuẫn; top10 YouTube chưa phủ góc này"}
+  Script:       {entry: validation_passed,       in: [source_pack, template],    out: script_md,         next: FactCheck,     validation: "đúng template; độ dài khớp format; không đoạn thiếu nguồn"}
+  FactCheck:    {entry: script_done,             in: [script_md, source_pack],   out: script_checked,    next: {sach: Review, loi: Script}, validation: "100% claim định lượng đối chiếu; LLM checker != LLM writer"}
+  Review:       {entry: factcheck_clean,         in: [script_checked],           out: script_approved,   next: {approve: Voice, reject: Planning}, validation: "HUMAN GATE 1 — người đọc toàn bộ, ký duyệt trong DB, SLA 24h", human_gate: true}
+  Voice:        {entry: script_approved,         in: [script_ssml],              out: [voice_wav, sentence_timestamps], next: Image, validation: "STT đối chiếu WER; nghe kiểm 3 đoạn ngẫu nhiên; không hallucination"}
+  Image:        {entry: voice_done,              in: [script_md, shotlist],      out: asset_pack,        next: Video,         validation: "phủ 100% timeline; license mọi asset hợp lệ"}
+  Video:        {entry: assets_complete,         in: [voice_wav, asset_pack, template], out: segments,  next: Editing,       validation: "render không lỗi; đồng bộ timestamp"}
+  Editing:      {entry: segments_done,           in: [segments, music, sfx],     out: cut_mp4,           next: Thumbnail,     validation: "duration ±10%; -14 LUFS (VERIFY); không frame đen/câm"}
+  Thumbnail:    {entry: cut_done,                in: [title, key_visual],        out: thumb_candidates,  next: SEO,           validation: "đọc được cỡ nhỏ; đúng guideline; người chọn 1"}
+  SEO:          {entry: thumbnail_done,          in: [script_md, keywords],      out: metadata_pack,     next: Publishing,    validation: "title <=60 ký tự hiển thị; disclosure altered/synthetic nếu áp dụng"}
+  Publishing:   {entry: human_gate_2_approved,   in: [cut_mp4, metadata_pack, schedule], out: youtube_video_id, next: Analytics, validation: "HUMAN GATE 2; API trả video_id; quota đủ", human_gate: true}
+  Analytics:    {entry: published_48h,           in: [youtube_video_id],         out: metrics_48h_7d_28d, next: Optimization, validation: "đủ CTR, AVD, retention curve"}
+  Optimization: {entry: metrics_of_3plus_videos, in: [analytics_db],             out: change_list_1_3,   next: {default: Planning, scale_trigger: Scaling}, validation: "mỗi thay đổi gắn 1 số liệu + giả thuyết viết trước"}
+  Scaling:      {entry: triggers_module_09,      in: [system_stable],            out: new_channel_or_format, next: Planning, validation: "không vượt trần rủi ro tập trung"}
+  Retry:        {entry: state_failed_lt_max,     in: [state, error_log],         out: rerun,             next: {ok: next_state, exhausted: Error}, validation: "backoff đúng; tham số đã đổi nếu lỗi lặp"}
+  Error:        {entry: retry_exhausted,         in: [error_log],                out: ticket,            next: Recovery,      validation: "lỗi phân loại: tool|input|quota|policy"}
+  Recovery:     {entry: ticket_or_crash,         in: [db_state, artifacts],      out: resumed_pipeline,  next: {ok: last_incomplete_state, unrecoverable: Planning}, validation: "không mất artifact; nguyên nhân gốc vào changelog"}
+  Completed:    {entry: analytics_28d_done,      in: [full_record],              out: closed_dossier,    next: null,          validation: "hồ sơ đủ: chi phí thật, giờ người thật, KPI"}

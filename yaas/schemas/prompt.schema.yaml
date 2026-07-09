@@ -1,0 +1,25 @@
+# YAAS prompt schema — mọi prompt production trong yaas/prompts/ theo cấu trúc này
+# Tương thích đa model (GOVERNANCE i3): cấm tính năng riêng vendor trong thân prompt;
+# khác biệt cú pháp giữa model xử lý ở adapter (module 03), không xử lý trong prompt.
+schema: yaas.prompt
+schema_version: 2.0.0
+
+header:
+  version:      {type: semver}
+  last_updated: {type: date}
+  module:       {type: text, desc: "module sở hữu, vd: 03-pipeline-kich-ban"}
+  model_tested: {type: list, desc: "model + version đã test prompt này, kèm ngày"}
+
+blocks:                       # đủ 12 khối, đúng thứ tự
+  role:             {desc: "prompt đóng vai gì — 1-2 câu, không tô vẽ"}
+  mission:          {desc: "một nhiệm vụ duy nhất, đo được"}
+  context:          {desc: "ngữ cảnh tối thiểu đủ làm việc; biến động đưa vào input, không hardcode"}
+  input:            {desc: "khai báo từng input: tên, định dạng, ví dụ"}
+  output:           {desc: "định dạng output CHÍNH XÁC (schema/ví dụ); máy parse được"}
+  rules:            {desc: "ràng buộc đánh số; ràng buộc chính sách/bằng chứng đặt đầu"}
+  tools:            {desc: "tool được phép gọi + khi nào; 'none' nếu không có"}
+  workflow:         {desc: "các bước xử lý nội bộ đánh số"}
+  validation:       {desc: "prompt tự kiểm output trước khi trả: checklist nội tuyến"}
+  quality_check:    {desc: "tiêu chí chất lượng vượt trên đúng-sai: giọng, độ dài, cấu trúc"}
+  error_handling:   {desc: "thiếu input / mâu thuẫn / không đủ bằng chứng => hành vi quy định sẵn (không đoán)"}
+  success_criteria: {desc: "định nghĩa output đạt, dùng được bởi bước Validation của state machine"}

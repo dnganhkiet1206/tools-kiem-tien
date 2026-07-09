@@ -28,9 +28,11 @@ Thư viện Skills, SOP, Framework và Decision Tree để một người bình 
 | `06-skill-content-engine.md` | Content Engine — gộp mọi kênh (LinkedIn/SEO/YouTube/X...) thành 1 skill inbound, bối cảnh AI search 2026 | ✅ |
 | `07-skill-micro-saas.md` | Micro SaaS trích xuất từ dịch vụ — presale trước code, xây ≤4 tuần, đường thoát khỏi bán giờ | ✅ |
 | `08-skill-hiring-delegation.md` | Hiring, Delegation & Agency hoá — trật tự thuê, agent-vs-người, bài kiểm tra vắng mặt | ✅ |
-| Chapter kế tiếp | Sales sâu: Offer, Pricing, Negotiation (nâng cấp từ nền `02`) | 🔜 |
-| Chapter kế tiếp | Digital Products & Newsletter (Tier 3 — đóng gói tri thức sau khi có kết quả thật) | 🔜 |
-| Chapter kế tiếp | Systems Thinking & Wealth Flywheel (G3 — phân bổ vốn, nhân bản, thoát vận hành) | 🔜 |
+| `09-skill-sales-pricing-negotiation.md` | Sales sâu — cấu trúc cuộc gọi 4 phần, xử lý từ chối, luật đàm phán, thang giá 3 bậc | ✅ |
+| `10-skill-digital-products-newsletter.md` | Digital Products & Newsletter (Tier 3) — điều kiện mở khoá, thang sản phẩm, launch SOP | ✅ |
+| `11-skill-systems-wealth-flywheel.md` | Systems Thinking & Wealth Flywheel (G3) — bánh đà, phân bổ vốn, trần rủi ro, 3 lối ra | ✅ |
+
+**Bộ lõi hoàn chỉnh (00–11).** Toàn bộ lộ trình 0 → 1M/năm đã được phủ: hiến pháp → sàng lọc → kiếm khách → bán → giao hàng → nhân bản sức lao động → sản phẩm hoá → tài sản hoá. Các chapter mở rộng (nếu cần sau này) sẽ là phiên bản ngách-cụ-thể của các skill lõi, không phải skill mới.
 
 ## Nguyên tắc không lặp nội dung
 
